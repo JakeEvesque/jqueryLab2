@@ -1,7 +1,10 @@
-let sentences = ['ten ate neite ate nee enet ite ate inet ent eate', 'Too ato too nOt enot one totA not anot tOO aNot', 'oat itain oat tain nate eate tea anne inant nean', 'itant eate anot eat nato inate eat anot tain eat', 'nee ene ate ite tent tiet ent ine ene ete ene ate'];
-//let sentences = ['ten ent eate', 'Too ato too', 'oat itain oat', 'itant eate anot', 'nee ene ate'];
+
+
+//let sentences = ['ten ate neite ate nee enet ite ate inet ent eate', 'Too ato too nOt enot one totA not anot tOO aNot', 'oat itain oat tain nate eate tea anne inant nean', 'itant eate anot eat nato inate eat anot tain eat', 'nee ene ate ite tent tiet ent ine ene ete ene ate'];
+let sentences = ['ten ent eate', 'Too ato too', 'oat itain oat', 'itant eate anot', 'nee ene ate'];
 let currentSentence = -1;
 let sentence = {
+    highScrore: 0,
     text: "",
     currentPos: 0,
     startTime: null,
@@ -12,6 +15,7 @@ let sentence = {
         this.currentPos = 0;
         this.words = 0;
         this.errors = 0;
+        $("#feedback").html("");
         this.set();
     },
     len: function () {
@@ -20,19 +24,31 @@ let sentence = {
     set: function (){
         currentSentence++;    
         if (currentSentence > sentences.length-1){
-            var endTime = new Date();
-
-            var ts = endTime.getTime() - this.startTime.getTime();
-            //alert(ts/60000);
-            var wordsPerMin = (this.words / (ts/60000)) - (2 * this.errors);
-            if (confirm("You typed " + wordsPerMin.toFixed(0) + " words per minute.  Play again?")){
-                this.reset();
+            let endTime = new Date();
+            let ts = endTime.getTime() - this.startTime.getTime();
+            let wordsPerMin = ((this.words / (ts/60000)) - (2 * this.errors)).toFixed(1);
+            if (wordsPerMin < 0){
+                wordsPerMin = 0;
             }
+            let playAgainHtml = "";
+            if (wordsPerMin > this.highScrore){
+                this.highScrore = wordsPerMin;
+                playAgainHtml += "<h3>Congratulations you set a new high score of " + wordsPerMin + " words per minute</h3>.";
+            } else if (wordsPerMin === this.highScrore) {
+                playAgainHtml += "<h3>Congratulations you tied the current high score of " + wordsPerMin + " words per minute.</h3>";
+            } else {
+                playAgainHtml += "<h3>You typed " + wordsPerMin + " words per minute.  You are on your way to reaching the current high score of " + this.highScrore + ".</h3>";
+            }
+            $("#btnPlayAgain").click(function () {
+                sentence.reset();
+            });
+            $("#playAgainText").html(playAgainHtml);
+            $("#myModal").modal();
             return;
         }
 
         this.text = sentences[currentSentence];
-        var wordList = this.text.split(" ");
+        let wordList = this.text.split(" ");
         this.words += wordList.length;
         this.currentPos = 0;
         let displayString = "";
@@ -77,6 +93,7 @@ let sentence = {
 }
 
 $().ready(function () {
+
     $("#keyboard-upper-container").addClass('hide');
 
     $(document.body).on("keypress", function (event) {
