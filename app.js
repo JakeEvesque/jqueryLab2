@@ -47,6 +47,10 @@ let sentence = {
         $("#target-letter").html(this.text[this.currentPos]);
     },
     checkChar: function (char) {
+        if (this.currentPos === 0 && (char === " " || char == "Enter")){
+            return;
+        }
+
         if (currentSentence === 0 && this.currentPos === 0){
             this.startTime = new Date();
         }
@@ -71,9 +75,6 @@ let sentence = {
         }
     } 
 }
-
-
-
 
 $().ready(function () {
     $("#keyboard-upper-container").addClass('hide');
